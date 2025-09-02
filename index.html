@@ -150,7 +150,21 @@ type="image/png">
                 // Sınır kontrolü
                 if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
                 if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
-                
+                 stars.forEach(otherStar => {
+                    const distance = Math.sqrt(
+                        Math.pow(otherStar.x - star.x, 2) + 
+                        Math.pow(otherStar.y - star.y, 2)
+                    );
+                    
+                    if (distance < maxDistance / 2) {
+                        const opacity = 1 - distance / (maxDistance / 2);
+                        drawLine(star.x, star.y, otherStar.x, otherStar.y, opacity * 0.3);
+                    }
+                });
+            });
+            
+            requestAnimationFrame(animate);
+        }
                 
         
         // Pencere boyutu değiştiğinde canvas'ı yeniden boyutlandır
