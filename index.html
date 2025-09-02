@@ -81,6 +81,7 @@ type="image/png">
 
   </head>
   <body>
+    <canvas id="starfield"></canvas>
     <h1>all projects/tüm projelerim</h1>
     
 <a href="https://lbusiedcake7945.github.io/luner-art.github.io/lunerart-upd-2-0.html" target="_blank"><h2>Luner Art Studio</h2></a>
@@ -150,35 +151,7 @@ type="image/png">
                 if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
                 if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
                 
-                // Fareye yakın yıldızlar arasında çizgi çiz
-                if (mouse.x !== null && mouse.y !== null) {
-                    const distance = Math.sqrt(
-                        Math.pow(mouse.x - star.x, 2) + 
-                        Math.pow(mouse.y - star.y, 2)
-                    );
-                    
-                    if (distance < maxDistance) {
-                        const opacity = 1 - distance / maxDistance;
-                        drawLine(mouse.x, mouse.y, star.x, star.y, opacity);
-                    }
-                }
                 
-                // Yıldızlar arasında çizgi çiz
-                stars.forEach(otherStar => {
-                    const distance = Math.sqrt(
-                        Math.pow(otherStar.x - star.x, 2) + 
-                        Math.pow(otherStar.y - star.y, 2)
-                    );
-                    
-                    if (distance < maxDistance / 2) {
-                        const opacity = 1 - distance / (maxDistance / 2);
-                        drawLine(star.x, star.y, otherStar.x, otherStar.y, opacity * 0.3);
-                    }
-                });
-            });
-            
-            requestAnimationFrame(animate);
-        }
         
         // Pencere boyutu değiştiğinde canvas'ı yeniden boyutlandır
         window.addEventListener('resize', () => {
