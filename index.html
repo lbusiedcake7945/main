@@ -1,21 +1,67 @@
 <!DOCTYPE html>
  <style>
-    body {
-    background: darkgreen;
-     color: red;
-    }
-   body::before {
-            content: "";
-            position: absolute;
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: default;
+        }
+
+        canvas {
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: darkgreen;
             z-index: -1;
         }
-  
-  </style>
+
+        .content {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .api-endpoint {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 1rem 0;
+            flex: 1 1 300px;
+        }
+
+        .powered-by {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .api1 {
+            color: aqua;
+        }
+    </style>
 <html>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,4 +82,102 @@ type="image/png">
 <h2>languages/diller:türkçe</h2>
 
   </body>
+ 
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        
+        // Canvas'ı pencere boyutuna ayarla
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Yıldızları oluştur
+        const stars = [];
+        const starCount = 200;
+        const maxDistance = 150;
+        
+        for (let i = 0; i < starCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                vx: Math.floor(Math.random() * 50) - 25,
+                vy: Math.floor(Math.random() * 50) - 25
+            });
+        }
+        
+        // Fare pozisyonunu takip et
+        const mouse = { x: null, y: null };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        
+        // Çizgi çizme fonksiyonu
+        function drawLine(x1, y1, x2, y2, opacity) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+        }
+        
+        // Animasyon
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Yıldızları güncelle ve çiz
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                
+                // Yıldızları hareket ettir
+                star.x += star.vx / 100;
+                star.y += star.vy / 100;
+                
+                // Sınır kontrolü
+                if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
+                if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
+                
+                // Fareye yakın yıldızlar arasında çizgi çiz
+                if (mouse.x !== null && mouse.y !== null) {
+                    const distance = Math.sqrt(
+                        Math.pow(mouse.x - star.x, 2) + 
+                        Math.pow(mouse.y - star.y, 2)
+                    );
+                    
+                    if (distance < maxDistance) {
+                        const opacity = 1 - distance / maxDistance;
+                        drawLine(mouse.x, mouse.y, star.x, star.y, opacity);
+                    }
+                }
+                
+                // Yıldızlar arasında çizgi çiz
+                stars.forEach(otherStar => {
+                    const distance = Math.sqrt(
+                        Math.pow(otherStar.x - star.x, 2) + 
+                        Math.pow(otherStar.y - star.y, 2)
+                    );
+                    
+                    if (distance < maxDistance / 2) {
+                        const opacity = 1 - distance / (maxDistance / 2);
+                        drawLine(star.x, star.y, otherStar.x, otherStar.y, opacity * 0.3);
+                    }
+                });
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Pencere boyutu değiştiğinde canvas'ı yeniden boyutlandır
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        animate();
+    </script>
 </html>
